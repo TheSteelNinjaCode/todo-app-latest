@@ -1,0 +1,14 @@
+[
+    ".\/src\/app\\assets\\images\\prisma-php.png",
+    ".\/src\/app\\css\\index.css",
+    ".\/src\/app\\css\\styles.css",
+    ".\/src\/app\\css\\tailwind.css",
+    ".\/src\/app\\favicon.ico",
+    ".\/src\/app\\index.php",
+    ".\/src\/app\\js\\index.js",
+    ".\/src\/app\\layout.php",
+    ".\/src\/app\\metadata.php",
+    ".\/src\/app\\not-found.php",
+    ".\/src\/app\\_components\\create.php",
+    ".\/src\/app\\_components\\update.php"
+]
