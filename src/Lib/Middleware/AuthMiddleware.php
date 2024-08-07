@@ -16,7 +16,7 @@ class AuthMiddleware
 
         // Check if the user is authorized to access the route or redirect to login
         if (!self::isAuthorized()) {
-            redirect('/auth/login');
+            redirect('/login');
             exit;
         }
 

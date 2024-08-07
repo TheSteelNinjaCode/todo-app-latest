@@ -12,6 +12,11 @@
   "websocket": false,
   "prisma": true,
   "docker": false,
-  "version": "1.16.29",
-  "excludeFiles": []
+  "version": "1.16.32",
+  "excludeFiles": [
+    ".env",
+    "/prisma/schema.prisma",
+    "/src/app/index.php",
+    "/src/app/layout.php"
+  ]
 }

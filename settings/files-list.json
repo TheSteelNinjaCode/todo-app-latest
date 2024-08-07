@@ -1,4 +1,6 @@
 [
+    ".\/src\/app\\(auth)\\login\\index.php",
+    ".\/src\/app\\(auth)\\register\\index.php",
     ".\/src\/app\\assets\\images\\prisma-php.png",
     ".\/src\/app\\css\\index.css",
     ".\/src\/app\\css\\styles.css",

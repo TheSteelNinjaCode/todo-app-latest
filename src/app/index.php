@@ -3,15 +3,24 @@
 use Lib\Prisma\Classes\Prisma;
 use Lib\StateManager;
 use Lib\Validator;
+use Lib\Auth\Auth;
 
 $prisma = new Prisma();
 $state = new StateManager();
+$auth = new Auth();
+
+$user = $auth->getPayload();
 
 $isUpdate = $state->getState('isUpdate', false);
 
-$todos = $prisma->todo->findMany([], true);
 $itemToDeleteTitle = $state->getState('itemToDeleteTitle');
 $itemToDeleteId = $state->getState('itemToDeleteId');
+
+$todos = $prisma->todo->findMany([], true);
+
+$todoTotal = count($todos);
+$completed = count(array_filter($todos, fn ($todo) => $todo->completed));
+$notCompleted = $todoTotal - $completed;
 
 function isUpdateMode($data)
 {
@@ -45,14 +54,34 @@ function handleDeleteItem($data)
     $state->setState('itemToDeleteTitle', $title);
 }
 
+function handlerCompleted($data)
+{
+    global $prisma;
+
+    $id = $data->args[0] ?? '';
+    $completed = $data->completed->checked;
+    if (!is_string($id) && !is_bool($completed)) return;
+    $prisma->todo->update([
+        'where' => ['id' => $id],
+        'data' => ['completed' => $completed]
+    ]);
+}
+
+function logout()
+{
+    global $auth;
+
+    $auth->logout('/login');
+}
+
 ?>
 
 <div class="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
     <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 space-y-2">
         <div class="flex flex-col gap-4">
             <div class="flex justify-between">
-                <p class="font-semibold text-gray-800">Jeff</p>
-                <button class="text-blue-500 hover:text-blue-600">Logout</button>
+                <p class="font-semibold text-gray-800"><?= $user->name ?></p>
+                <button onclick="logout" class="text-blue-500 hover:text-blue-600">Logout</button>
             </div>
             <hr>
             <div class="flex gap-4 justify-between mb-4 items-center w-full">
@@ -74,8 +103,10 @@ function handleDeleteItem($data)
             <?php foreach ($todos as $todo) : ?>
                 <div class="flex items-center justify-between bg-gray-100 dark:bg-gray-700 rounded-md p-2">
                     <div class="flex items-center">
-                        <input type="checkbox" class="mr-2 text-blue-500 focus:ring-blue-500 focus:ring-2 rounded" />
-                        <span class="line-through text-gray-500 dark:text-gray-400"><?= $todo->title ?></span>
+                        <input id="<?= $todo->id ?>" type="checkbox" class="mr-2 text-blue-500 focus:ring-blue-500 focus:ring-2 rounded" name="completed" pp-beforeRequest="completed(this, event)" <?= $todo->completed ? 'checked' : '' ?> onchange="handlerCompleted('<?= $todo->id ?>')" />
+                        <span class="<?= $todo->completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200' ?>">
+                            <?= $todo->title ?>
+                        </span>
                     </div>
                     <div class="flex items-center space-x-2">
                         <button class="text-yellow-500 hover:text-yellow-600" onclick="isUpdateMode('true', '<?= $todo->id ?>', '<?= $todo->title ?>')" pp-suspense="{'targets': [{'id': '#edit-<?= $todo->id ?>', 'classList.add': 'hidden'}, {'id': '#spinner-update-<?= $todo->id ?>', 'classList.remove': 'hidden'}]}">
@@ -103,6 +134,10 @@ function handleDeleteItem($data)
                     </div>
                 </div>
             <?php endforeach; ?>
+        </div>
+        <div class="text-gray-500 pt-2 flex justify-between">
+            <span id="total">Total: <?= $todoTotal ?></span>
+            <span id="completed"><?= "Completed: $completed / $notCompleted" ?></span>
         </div>
     </div>
 </div>
@@ -133,3 +168,15 @@ function handleDeleteItem($data)
         </div>
     </div>
 </dialog>
+
+<script>
+    function completed(element, event) {
+        const siblingElement = document.getElementById(element.id).nextElementSibling;
+        siblingElement.className = element.checked ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-800 dark:text-gray-200';
+
+        const completed = document.querySelectorAll('input[name="completed"]:checked').length;
+        const notCompleted = document.querySelectorAll('input[name="completed"]').length - completed;
+
+        document.getElementById('completed').textContent = `Completed: ${completed} / ${notCompleted}`
+    }
+</script>

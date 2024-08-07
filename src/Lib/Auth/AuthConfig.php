@@ -26,7 +26,7 @@ class AuthConfig
     // An array of private routes that are accessible to all authenticated users
     // without specific role-based access control. Routes should be listed as string paths.
     // Example: public static $privateRoutes = ['profile', 'dashboard/settings'];
-    public static $privateRoutes = [];
+    public static $privateRoutes = ['/'];
 
     // An associative array mapping specific routes to required user roles for access control.
     // Each route is a key with an array of roles that are allowed access.
