@@ -2,16 +2,24 @@
 
 use Lib\Prisma\Classes\Prisma;
 use Lib\Validator;
+use Lib\Auth\Auth;
 
 function create($data)
 {
     $prisma = new Prisma();
+    $auth = new Auth();
+
     $title = $data->title;
 
     if (!Validator::string($title)) return;
     $prisma->todo->create([
         'data' => [
-            'title' => $title
+            'title' => $title,
+            'user' => [
+                'connect' => [
+                    'id' => $auth->getPayload()->id
+                ]
+            ]
         ]
     ]);
 }

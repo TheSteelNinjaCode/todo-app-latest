@@ -12,5 +12,9 @@
     ".\/src\/app\\metadata.php",
     ".\/src\/app\\not-found.php",
     ".\/src\/app\\_components\\create.php",
+    ".\/src\/app\\_components\\deleteModal.php",
+    ".\/src\/app\\_components\\profile.php",
+    ".\/src\/app\\_components\\search.php",
+    ".\/src\/app\\_components\\todos.php",
     ".\/src\/app\\_components\\update.php"
 ]
